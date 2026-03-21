@@ -73,9 +73,7 @@ export async function fetchJobTree(): Promise<JenkinsJob[]> {
   return flattenJobs(data.jobs ?? []);
 }
 
-async function fetchCrumb(
-  prefs: Preferences,
-): Promise<Record<string, string>> {
+async function fetchCrumb(prefs: Preferences): Promise<Record<string, string>> {
   const url = `${prefs.jenkinsUrl.replace(/\/$/, "")}/crumbIssuer/api/json`;
   const response = await fetch(url, {
     headers: { Authorization: buildAuthHeader(prefs.username, prefs.apiToken) },

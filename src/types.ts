@@ -71,4 +71,3 @@ export interface BuildHistoryEntry {
   triggeredAt: number;
   status: JobStatus;
 }
-
