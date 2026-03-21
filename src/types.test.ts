@@ -1,6 +1,12 @@
 // Placeholder test — verifies vitest is configured and types module exports are present
 import { describe, it, expect } from "vitest";
-import type { JobStatus, JenkinsJob, RecentJob, BuildHistoryEntry, ExtensionPreferences } from "./types";
+import type {
+  JobStatus,
+  JenkinsJob,
+  RecentJob,
+  BuildHistoryEntry,
+  ExtensionPreferences,
+} from "./types";
 
 describe("types module", () => {
   it("is importable (vitest sanity check)", () => {
@@ -8,12 +14,23 @@ describe("types module", () => {
   });
 
   it("JobStatus type accepts valid values", () => {
-    const statuses: JobStatus[] = ["running", "success", "failure", "aborted", "disabled"];
+    const statuses: JobStatus[] = [
+      "running",
+      "success",
+      "failure",
+      "aborted",
+      "disabled",
+    ];
     expect(statuses).toHaveLength(5);
   });
 
   it("JenkinsJob shape is assignable", () => {
-    const job: JenkinsJob = { name: "my-job", url: "http://jenkins/job/my-job", path: "my-job", status: "success" };
+    const job: JenkinsJob = {
+      name: "my-job",
+      url: "http://jenkins/job/my-job",
+      path: "my-job",
+      status: "success",
+    };
     expect(job.name).toBe("my-job");
   });
 

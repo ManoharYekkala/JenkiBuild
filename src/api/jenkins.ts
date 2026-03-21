@@ -1,4 +1,11 @@
-import { RawJenkinsNode, JenkinsJob, ExtensionPreferences, BuildParameter, JenkinsParamType, LastBuild } from "../types";
+import {
+  RawJenkinsNode,
+  JenkinsJob,
+  ExtensionPreferences,
+  BuildParameter,
+  JenkinsParamType,
+  LastBuild,
+} from "../types";
 import { normalizeJobStatus } from "../utils/status";
 import { assertOk } from "../utils/errors";
 import { getPreferenceValues } from "@raycast/api";
@@ -12,12 +19,16 @@ function toHttps(url: string): string {
 }
 
 export function buildTree(depth: number): string {
-  if (depth === 0) return "name,url,color,_class,lastBuild[number,timestamp,result]";
+  if (depth === 0)
+    return "name,url,color,_class,lastBuild[number,timestamp,result]";
   const inner = buildTree(depth - 1);
   return `name,url,color,_class,jobs[${inner}]`;
 }
 
-export function flattenJobs(nodes: RawJenkinsNode[], parentPath = ""): JenkinsJob[] {
+export function flattenJobs(
+  nodes: RawJenkinsNode[],
+  parentPath = "",
+): JenkinsJob[] {
   return nodes.flatMap((node) => {
     const path = parentPath ? `${parentPath}/${node.name}` : node.name;
     const hasChildren = Array.isArray(node.jobs) && node.jobs.length > 0;
@@ -64,18 +75,25 @@ export async function fetchJobTree(): Promise<JenkinsJob[]> {
   return flattenJobs(data.jobs ?? []);
 }
 
-async function fetchCrumb(prefs: ExtensionPreferences): Promise<Record<string, string>> {
+async function fetchCrumb(
+  prefs: ExtensionPreferences,
+): Promise<Record<string, string>> {
   const { default: fetch } = await import("node-fetch");
   const url = `${prefs.jenkinsUrl.replace(/\/$/, "")}/crumbIssuer/api/json`;
   const response = await fetch(url, {
     headers: { Authorization: buildAuthHeader(prefs.username, prefs.apiToken) },
   });
   if (!response.ok) return {}; // crumb disabled or not available
-  const data = (await response.json()) as { crumbRequestField: string; crumb: string };
+  const data = (await response.json()) as {
+    crumbRequestField: string;
+    crumb: string;
+  };
   return { [data.crumbRequestField]: data.crumb };
 }
 
-export async function fetchJobParameters(jobUrl: string): Promise<BuildParameter[]> {
+export async function fetchJobParameters(
+  jobUrl: string,
+): Promise<BuildParameter[]> {
   const { default: fetch } = await import("node-fetch");
   const prefs = getPreferenceValues<ExtensionPreferences>();
   const url = `${toHttps(jobUrl).replace(/\/$/, "")}/api/json?tree=property[parameterDefinitions[name,description,type,defaultParameterValue[value],choices]]`;
@@ -94,7 +112,9 @@ export async function fetchJobParameters(jobUrl: string): Promise<BuildParameter
       }>;
     }>;
   };
-  const paramsProp = data.property?.find((p) => Array.isArray(p.parameterDefinitions));
+  const paramsProp = data.property?.find((p) =>
+    Array.isArray(p.parameterDefinitions),
+  );
   if (!paramsProp?.parameterDefinitions) return [];
   return paramsProp.parameterDefinitions.map((p) => ({
     name: p.name,
@@ -105,17 +125,25 @@ export async function fetchJobParameters(jobUrl: string): Promise<BuildParameter
   }));
 }
 
-export async function triggerBuild(jobUrl: string, params: Record<string, string>): Promise<string> {
+export async function triggerBuild(
+  jobUrl: string,
+  params: Record<string, string>,
+): Promise<string> {
   const { default: fetch } = await import("node-fetch");
   const prefs = getPreferenceValues<ExtensionPreferences>();
   const crumbHeaders = await fetchCrumb(prefs);
   const hasParams = Object.keys(params).length > 0;
   const endpoint = hasParams ? "buildWithParameters" : "build";
-  const qs = hasParams ? `?${new URLSearchParams(params).toString()}` : "?delay=0sec";
+  const qs = hasParams
+    ? `?${new URLSearchParams(params).toString()}`
+    : "?delay=0sec";
   const url = `${toHttps(jobUrl).replace(/\/$/, "")}/${endpoint}${qs}`;
   const response = await fetch(url, {
     method: "POST",
-    headers: { Authorization: buildAuthHeader(prefs.username, prefs.apiToken), ...crumbHeaders },
+    headers: {
+      Authorization: buildAuthHeader(prefs.username, prefs.apiToken),
+      ...crumbHeaders,
+    },
     redirect: "manual",
   });
   if (response.status !== 201) {
@@ -145,7 +173,9 @@ export async function fetchBuildStatus(buildUrl: string): Promise<BuildStatus> {
   return (await response.json()) as BuildStatus;
 }
 
-export async function pollQueueItem(queueItemUrl: string): Promise<number | null> {
+export async function pollQueueItem(
+  queueItemUrl: string,
+): Promise<number | null> {
   const { default: fetch } = await import("node-fetch");
   const prefs = getPreferenceValues<ExtensionPreferences>();
   const url = `${toHttps(queueItemUrl).replace(/\/$/, "")}/api/json`;
@@ -153,6 +183,8 @@ export async function pollQueueItem(queueItemUrl: string): Promise<number | null
     headers: { Authorization: buildAuthHeader(prefs.username, prefs.apiToken) },
   });
   if (!response.ok) return null;
-  const data = (await response.json()) as { executable?: { number: number; url: string } };
+  const data = (await response.json()) as {
+    executable?: { number: number; url: string };
+  };
   return data.executable?.number ?? null;
 }

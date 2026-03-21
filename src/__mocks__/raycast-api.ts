@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Mock for @raycast/api — used by vitest to prevent resolution failures
 // fetchJobTree is not tested in unit tests; only pure functions are tested.
 export function getPreferenceValues<T>(): T {
@@ -37,7 +38,11 @@ export const List = {
 export const ActionPanel = {} as any;
 export const Action = {} as any;
 export const Form = {} as any;
-export const Toast = { Style: { Failure: "failure", Success: "success", Animated: "animated" } };
+export const Toast = {
+  Style: { Failure: "failure", Success: "success", Animated: "animated" },
+};
 export function showToast() {}
-export function useNavigation() { return { push: () => {}, pop: () => {} }; }
+export function useNavigation() {
+  return { push: () => {}, pop: () => {} };
+}
 export function open() {}

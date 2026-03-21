@@ -12,7 +12,12 @@ export function buildUrl(jobUrl: string, buildNumber: number): string | null {
 }
 
 export function reconstructJob(entry: BuildHistoryEntry): JenkinsJob {
-  return { name: entry.jobName, url: entry.jobUrl, path: entry.jobPath, status: entry.status };
+  return {
+    name: entry.jobName,
+    url: entry.jobUrl,
+    path: entry.jobPath,
+    status: entry.status,
+  };
 }
 
 interface BuildHistoryProps {
@@ -23,18 +28,25 @@ export default function BuildHistory({ jobPath }: BuildHistoryProps = {}) {
   const { data, isLoading } = useCachedPromise(getBuildHistory);
   const { push } = useNavigation();
 
-  const entries = jobPath ? (data ?? []).filter((e) => e.jobPath === jobPath) : (data ?? []);
+  const entries = jobPath
+    ? (data ?? []).filter((e) => e.jobPath === jobPath)
+    : (data ?? []);
 
   return (
     <List isLoading={isLoading} navigationTitle="Build History">
       {!isLoading && entries.length === 0 && (
-        <List.EmptyView title="No Build History" description="Trigger a build to see it here." />
+        <List.EmptyView
+          title="No Build History"
+          description="Trigger a build to see it here."
+        />
       )}
       {entries.map((entry) => (
         <List.Item
           key={`${entry.jobPath}-${entry.triggeredAt}`}
           title={entry.jobName}
-          subtitle={entry.buildNumber === 0 ? "#queued" : `#${entry.buildNumber}`}
+          subtitle={
+            entry.buildNumber === 0 ? "#queued" : `#${entry.buildNumber}`
+          }
           icon={getStatusIcon(entry.status)}
           accessories={[
             {
@@ -53,7 +65,9 @@ export default function BuildHistory({ jobPath }: BuildHistoryProps = {}) {
               <Action
                 title="Re-trigger Build"
                 icon={Icon.Play}
-                onAction={() => push(<BuildParamForm job={reconstructJob(entry)} />)}
+                onAction={() =>
+                  push(<BuildParamForm job={reconstructJob(entry)} />)
+                }
               />
             </ActionPanel>
           }

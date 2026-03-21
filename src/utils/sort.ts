@@ -8,7 +8,7 @@ import { JenkinsJob } from "../types";
 export function sortJobs(
   jobs: JenkinsJob[],
   favorites: string[],
-  recentJobs: string[]
+  recentJobs: string[],
 ): JenkinsJob[] {
   const favSet = new Set(favorites);
   const recentSet = new Set(recentJobs);
@@ -30,7 +30,9 @@ export function sortJobs(
   // Sort favorites by their position in the favorites array
   favJobs.sort((a, b) => favorites.indexOf(a.path) - favorites.indexOf(b.path));
   // Sort recent by their position in the recentJobs array (most recent first)
-  recentJobsList.sort((a, b) => recentJobs.indexOf(a.path) - recentJobs.indexOf(b.path));
+  recentJobsList.sort(
+    (a, b) => recentJobs.indexOf(a.path) - recentJobs.indexOf(b.path),
+  );
   // Sort rest alphabetically by path (case-insensitive)
   rest.sort((a, b) => a.path.toLowerCase().localeCompare(b.path.toLowerCase()));
 

@@ -42,7 +42,10 @@ export async function getRecentJobs(): Promise<string[]> {
 
 export async function pushRecentJob(jobPath: string): Promise<void> {
   const current = await getRecentJobs();
-  const deduped = [jobPath, ...current.filter((p) => p !== jobPath)].slice(0, 10);
+  const deduped = [jobPath, ...current.filter((p) => p !== jobPath)].slice(
+    0,
+    10,
+  );
   await LocalStorage.setItem(KEYS.recentJobs, JSON.stringify(deduped));
 }
 
@@ -54,7 +57,9 @@ export async function getBuildHistory(): Promise<BuildHistoryEntry[]> {
   return JSON.parse(raw) as BuildHistoryEntry[];
 }
 
-export async function pushBuildHistory(entry: BuildHistoryEntry): Promise<void> {
+export async function pushBuildHistory(
+  entry: BuildHistoryEntry,
+): Promise<void> {
   const current = await getBuildHistory();
   const updated = [entry, ...current].slice(0, 20);
   await LocalStorage.setItem(KEYS.buildHistory, JSON.stringify(updated));

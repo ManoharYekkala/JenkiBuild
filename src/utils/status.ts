@@ -1,7 +1,10 @@
 import { Icon, Color } from "@raycast/api";
 import { JobStatus } from "../types";
 
-export function getStatusIcon(status: JobStatus): { source: Icon; tintColor: Color } {
+export function getStatusIcon(status: JobStatus): {
+  source: Icon;
+  tintColor: Color;
+} {
   switch (status) {
     case "success":
       return { source: Icon.CheckCircle, tintColor: Color.Green };

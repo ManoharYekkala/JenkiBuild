@@ -6,13 +6,13 @@ import { getStatusIcon } from "./utils/status";
 describe("buildUrl", () => {
   it("constructs URL correctly with trailing slash", () => {
     expect(buildUrl("https://jenkins.example.com/job/my-job/", 42)).toBe(
-      "https://jenkins.example.com/job/my-job/42/"
+      "https://jenkins.example.com/job/my-job/42/",
     );
   });
 
   it("strips trailing slash before appending build number", () => {
     expect(buildUrl("https://jenkins.example.com/job/my-job", 42)).toBe(
-      "https://jenkins.example.com/job/my-job/42/"
+      "https://jenkins.example.com/job/my-job/42/",
     );
   });
 

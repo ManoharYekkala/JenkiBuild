@@ -1,8 +1,21 @@
-import { List, Icon, showToast, Toast, ActionPanel, Action, useNavigation } from "@raycast/api";
+import {
+  List,
+  Icon,
+  showToast,
+  Toast,
+  ActionPanel,
+  Action,
+  useNavigation,
+} from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { useState, useEffect, useMemo } from "react";
 import { fetchJobTree } from "./api/jenkins";
-import { getFavorites, getRecentJobs, addFavorite, removeFavorite } from "./storage";
+import {
+  getFavorites,
+  getRecentJobs,
+  addFavorite,
+  removeFavorite,
+} from "./storage";
 import { sortJobs } from "./utils/sort";
 import { handleFetchError } from "./utils/errors";
 import { JenkinsJob } from "./types";
@@ -11,7 +24,10 @@ import { BuildParamForm } from "./components/BuildParamForm";
 import { getStatusIcon } from "./utils/status";
 import BuildHistory from "./build-history";
 
-function getAccessories(job: JenkinsJob, isFavorite: boolean): List.Item.Accessory[] {
+function getAccessories(
+  job: JenkinsJob,
+  isFavorite: boolean,
+): List.Item.Accessory[] {
   const acc: List.Item.Accessory[] = [];
   if (isFavorite) acc.push({ icon: Icon.Star, tooltip: "Favorite" });
   if (job.lastBuild) {
@@ -70,7 +86,9 @@ function JobActions({
 }
 
 export default function TriggerBuild() {
-  const { data, isLoading, error } = useCachedPromise(fetchJobTree, [], { keepPreviousData: true });
+  const { data, isLoading, error } = useCachedPromise(fetchJobTree, [], {
+    keepPreviousData: true,
+  });
   const favorites = useCachedPromise(getFavorites);
   const recentJobs = useCachedPromise(getRecentJobs);
 
@@ -82,7 +100,11 @@ export default function TriggerBuild() {
   }, [favorites.data]);
 
   if (error) {
-    showToast({ style: Toast.Style.Failure, title: "Failed to load jobs", message: handleFetchError(error) });
+    showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to load jobs",
+      message: handleFetchError(error),
+    });
   }
 
   async function toggleFavorite(path: string) {
@@ -105,7 +127,10 @@ export default function TriggerBuild() {
   const filteredJobs = useMemo(() => {
     if (!searchText) return sortedJobs;
     const q = searchText.toLowerCase();
-    return sortedJobs.filter((j) => j.path.toLowerCase().includes(q) || j.name.toLowerCase().includes(q));
+    return sortedJobs.filter(
+      (j) =>
+        j.path.toLowerCase().includes(q) || j.name.toLowerCase().includes(q),
+    );
   }, [sortedJobs, searchText]);
 
   const favoriteJobs = filteredJobs.filter((j) => favoriteSet.has(j.path));
@@ -121,7 +146,12 @@ export default function TriggerBuild() {
   }
 
   return (
-    <List isLoading={isLoading} filtering={false} onSearchTextChange={setSearchText} searchBarPlaceholder="Search jobs...">
+    <List
+      isLoading={isLoading}
+      filtering={false}
+      onSearchTextChange={setSearchText}
+      searchBarPlaceholder="Search jobs..."
+    >
       {!isLoading && filteredJobs.length === 0 && (
         <List.EmptyView
           title="No Jenkins Jobs Found"
@@ -137,7 +167,13 @@ export default function TriggerBuild() {
               subtitle={job.path}
               icon={getStatusIcon(job.status)}
               accessories={getAccessories(job, true)}
-              actions={<JobActions job={job} isFavorite={true} onToggleFavorite={toggleFavorite} />}
+              actions={
+                <JobActions
+                  job={job}
+                  isFavorite={true}
+                  onToggleFavorite={toggleFavorite}
+                />
+              }
             />
           ))}
         </List.Section>
@@ -150,7 +186,13 @@ export default function TriggerBuild() {
               title={job.name}
               icon={getStatusIcon(job.status)}
               accessories={getAccessories(job, false)}
-              actions={<JobActions job={job} isFavorite={false} onToggleFavorite={toggleFavorite} />}
+              actions={
+                <JobActions
+                  job={job}
+                  isFavorite={false}
+                  onToggleFavorite={toggleFavorite}
+                />
+              }
             />
           ))}
         </List.Section>

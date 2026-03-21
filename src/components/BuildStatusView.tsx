@@ -24,7 +24,12 @@ function formatDuration(ms: number): string {
   return rem > 0 ? `${m}m ${rem}s` : `${m}m`;
 }
 
-export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: BuildStatusViewProps) {
+export function BuildStatusView({
+  jobName,
+  jobPath,
+  jobUrl,
+  buildNumber,
+}: BuildStatusViewProps) {
   const [status, setStatus] = useState<BuildStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -64,13 +69,17 @@ export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: Build
     if (error) return `## Error\n\n${error}`;
     if (!status) return "Loading build status...";
 
-    const resultEmoji =
-      status.building ? "🔵 Building"
-      : status.result === "SUCCESS" ? "✅ Success"
-      : status.result === "FAILURE" ? "❌ Failed"
-      : status.result === "ABORTED" ? "⛔ Aborted"
-      : status.result === "UNSTABLE" ? "⚠️ Unstable"
-      : "❓ Unknown";
+    const resultEmoji = status.building
+      ? "🔵 Building"
+      : status.result === "SUCCESS"
+        ? "✅ Success"
+        : status.result === "FAILURE"
+          ? "❌ Failed"
+          : status.result === "ABORTED"
+            ? "⛔ Aborted"
+            : status.result === "UNSTABLE"
+              ? "⚠️ Unstable"
+              : "❓ Unknown";
 
     const lines: string[] = [
       `# ${jobName} — Build #${buildNumber}`,
@@ -83,12 +92,18 @@ export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: Build
 
     if (status.building) {
       const totalMs = elapsed + status.duration;
-      const pct = status.estimatedDuration > 0
-        ? Math.min(100, Math.round((totalMs / status.estimatedDuration) * 100))
-        : 0;
+      const pct =
+        status.estimatedDuration > 0
+          ? Math.min(
+              100,
+              Math.round((totalMs / status.estimatedDuration) * 100),
+            )
+          : 0;
       lines.push(`| Elapsed | ${formatDuration(totalMs)} |`);
       if (status.estimatedDuration > 0) {
-        lines.push(`| Estimated | ~${formatDuration(status.estimatedDuration)} |`);
+        lines.push(
+          `| Estimated | ~${formatDuration(status.estimatedDuration)} |`,
+        );
         lines.push("", `**Progress: ${pct}%**`, `\`${progressBar(pct)}\``);
       }
     } else {
@@ -102,10 +117,13 @@ export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: Build
   }
 
   const resultColor: Color =
-    !status || status.building ? Color.Blue
-    : status.result === "SUCCESS" ? Color.Green
-    : status.result === "FAILURE" ? Color.Red
-    : Color.Orange;
+    !status || status.building
+      ? Color.Blue
+      : status.result === "SUCCESS"
+        ? Color.Green
+        : status.result === "FAILURE"
+          ? Color.Red
+          : Color.Orange;
 
   return (
     <Detail
@@ -116,7 +134,9 @@ export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: Build
           <Detail.Metadata>
             <Detail.Metadata.TagList title="Status">
               <Detail.Metadata.TagList.Item
-                text={status.building ? "Building" : (status.result ?? "Unknown")}
+                text={
+                  status.building ? "Building" : (status.result ?? "Unknown")
+                }
                 color={resultColor}
               />
             </Detail.Metadata.TagList>
@@ -131,7 +151,11 @@ export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: Build
               />
             )}
             <Detail.Metadata.Separator />
-            <Detail.Metadata.Link title="Open Build" target={buildUrl} text={`Build #${buildNumber}`} />
+            <Detail.Metadata.Link
+              title="Open Build"
+              target={buildUrl}
+              text={`Build #${buildNumber}`}
+            />
           </Detail.Metadata>
         )
       }
