@@ -50,7 +50,7 @@ describe("flattenJobs", () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
       name: "my-job",
-      url: "http://jenkins/job/my-job/",
+      url: "https://jenkins/job/my-job/",
       path: "my-job",
       status: "success",
     });
@@ -289,6 +289,7 @@ describe("triggerBuild", () => {
   it("returns Location header value as queue item URL on 201", async () => {
     const { default: fetch } = await import("node-fetch");
     const mockFetch = vi.mocked(fetch);
+    mockFetch.mockResolvedValueOnce({ ok: false } as never); // crumb fetch: disabled
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 201,
@@ -303,6 +304,7 @@ describe("triggerBuild", () => {
   it("uses /build endpoint when params is empty object", async () => {
     const { default: fetch } = await import("node-fetch");
     const mockFetch = vi.mocked(fetch);
+    mockFetch.mockResolvedValueOnce({ ok: false } as never); // crumb fetch: disabled
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 201,
@@ -311,7 +313,7 @@ describe("triggerBuild", () => {
 
     const { triggerBuild } = await import("./jenkins");
     await triggerBuild("http://jenkins/job/my-job/", {});
-    const calledUrl = mockFetch.mock.calls[0][0] as string;
+    const calledUrl = mockFetch.mock.calls[1][0] as string;
     expect(calledUrl).toContain("/build");
     expect(calledUrl).not.toContain("buildWithParameters");
   });
@@ -319,6 +321,7 @@ describe("triggerBuild", () => {
   it("uses /buildWithParameters with query string when params has keys", async () => {
     const { default: fetch } = await import("node-fetch");
     const mockFetch = vi.mocked(fetch);
+    mockFetch.mockResolvedValueOnce({ ok: false } as never); // crumb fetch: disabled
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 201,
@@ -327,7 +330,7 @@ describe("triggerBuild", () => {
 
     const { triggerBuild } = await import("./jenkins");
     await triggerBuild("http://jenkins/job/my-job/", { KEY: "VALUE" });
-    const calledUrl = mockFetch.mock.calls[0][0] as string;
+    const calledUrl = mockFetch.mock.calls[1][0] as string;
     expect(calledUrl).toContain("buildWithParameters");
     expect(calledUrl).toContain("KEY=VALUE");
   });

@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "jenkins-build-trigger",
-  "title": "Jenkins Build Trigger",
+  "name": "jenki-build",
+  "title": "JenkiBuild",
   "description": "Search and trigger Jenkins builds without leaving the keyboard",
   "icon": "icon.png",
   "author": "manoharyekkala",
