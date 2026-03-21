@@ -1,28 +1,15 @@
-import { List, Color, Icon, showToast, Toast, ActionPanel, Action, useNavigation, open } from "@raycast/api";
+import { List, Icon, showToast, Toast, ActionPanel, Action, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { useState, useEffect, useMemo } from "react";
 import { fetchJobTree } from "./api/jenkins";
 import { getFavorites, getRecentJobs, addFavorite, removeFavorite } from "./storage";
 import { sortJobs } from "./utils/sort";
 import { handleFetchError } from "./utils/errors";
-import { JenkinsJob, JobStatus } from "./types";
+import { JenkinsJob } from "./types";
 import { relativeTime } from "./utils/time";
 import { BuildParamForm } from "./components/BuildParamForm";
-
-function getStatusIcon(status: JobStatus): { source: Icon; tintColor: Color } {
-  switch (status) {
-    case "success":
-      return { source: Icon.CheckCircle, tintColor: Color.Green };
-    case "failure":
-      return { source: Icon.XMarkCircle, tintColor: Color.Red };
-    case "running":
-      return { source: Icon.CircleProgress, tintColor: Color.Blue };
-    case "aborted":
-      return { source: Icon.MinusCircle, tintColor: Color.Orange };
-    case "disabled":
-      return { source: Icon.Circle, tintColor: Color.SecondaryText };
-  }
-}
+import { getStatusIcon } from "./utils/status";
+import BuildHistory from "./build-history";
 
 function getAccessories(job: JenkinsJob, isFavorite: boolean): List.Item.Accessory[] {
   const acc: List.Item.Accessory[] = [];
@@ -76,11 +63,7 @@ function JobActions({
         title="View Build History"
         icon={Icon.Clock}
         shortcut={{ modifiers: ["cmd"], key: "h" }}
-        onAction={() => {
-          // Phase 3 will implement build history view
-          // For now, open job URL's build history page in browser
-          open(`${job.url.replace(/\/$/, "")}/builds`);
-        }}
+        onAction={() => push(<BuildHistory jobPath={job.path} />)}
       />
     </ActionPanel>
   );
