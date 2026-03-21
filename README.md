@@ -29,12 +29,12 @@ Trigger Jenkins builds from Raycast without leaving the keyboard.
 
 ### Extension Preferences
 
-| Preference | Required | Description |
-|------------|----------|-------------|
-| **Jenkins URL** | Yes | Base URL of your Jenkins instance (e.g., `https://jenkins.example.com`) |
-| **Username** | Yes | Your Jenkins username |
-| **API Token** | Yes | The API token generated above (stored securely, masked in UI) |
-| **Default Job Path** | No | Optional job path to pre-select when opening the extension |
+| Preference           | Required | Description                                                             |
+| -------------------- | -------- | ----------------------------------------------------------------------- |
+| **Jenkins URL**      | Yes      | Base URL of your Jenkins instance (e.g., `https://jenkins.example.com`) |
+| **Username**         | Yes      | Your Jenkins username                                                   |
+| **API Token**        | Yes      | The API token generated above (stored securely, masked in UI)           |
+| **Default Job Path** | No       | Optional job path to pre-select when opening the extension              |
 
 ## Usage
 
