@@ -3,12 +3,13 @@
   "name": "jenkins-build-trigger",
   "title": "Jenkins Build Trigger",
   "description": "Search and trigger Jenkins builds without leaving the keyboard",
-  "icon": "extension-icon.png",
+  "icon": "icon.png",
   "author": "manoharyekkala",
   "categories": [
     "Developer Tools"
   ],
   "license": "MIT",
+  "keywords": ["jenkins", "ci", "build", "devops", "automation"],
   "commands": [
     {
       "name": "trigger-build",
