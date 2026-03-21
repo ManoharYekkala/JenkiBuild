@@ -72,10 +72,3 @@ export interface BuildHistoryEntry {
   status: JobStatus;
 }
 
-/** Raycast extension preferences shape */
-export interface ExtensionPreferences {
-  jenkinsUrl: string;
-  username: string;
-  apiToken: string;
-  defaultJobPath?: string;
-}
