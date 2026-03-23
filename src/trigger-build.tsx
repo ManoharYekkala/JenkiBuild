@@ -99,7 +99,9 @@ export default function TriggerBuild() {
   const runningBuilds = useMemo(() => {
     if (!buildHistory.data) return [];
     const cutoff = Date.now() - TWO_HOURS_MS;
-    return buildHistory.data.filter((e: BuildHistoryEntry) => e.triggeredAt >= cutoff);
+    return buildHistory.data.filter(
+      (e: BuildHistoryEntry) => e.triggeredAt >= cutoff,
+    );
   }, [buildHistory.data]);
 
   const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());

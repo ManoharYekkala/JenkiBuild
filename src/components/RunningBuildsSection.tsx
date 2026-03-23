@@ -8,7 +8,11 @@ import { buildUrl, reconstructJob } from "../build-history";
 import { BuildStatusView } from "./BuildStatusView";
 import { BuildParamForm } from "./BuildParamForm";
 
-export function RunningBuildsSection({ entries }: { entries: BuildHistoryEntry[] }) {
+export function RunningBuildsSection({
+  entries,
+}: {
+  entries: BuildHistoryEntry[];
+}) {
   if (entries.length === 0) return null;
 
   return (
@@ -89,11 +93,19 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
       const totalMs = elapsed + status.duration;
       const pct =
         status.estimatedDuration > 0
-          ? Math.min(100, Math.round((totalMs / status.estimatedDuration) * 100))
+          ? Math.min(
+              100,
+              Math.round((totalMs / status.estimatedDuration) * 100),
+            )
           : 0;
       return [
         { text: progressBar(pct) + " " + pct + "%" },
-        { text: formatDuration(totalMs) + "/" + formatDuration(status.estimatedDuration) },
+        {
+          text:
+            formatDuration(totalMs) +
+            "/" +
+            formatDuration(status.estimatedDuration),
+        },
       ];
     }
     // Finished
@@ -105,10 +117,7 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
           : status.result === "ABORTED"
             ? "Aborted"
             : (status.result ?? "Done");
-    return [
-      { text: label },
-      { text: formatDuration(status.duration) },
-    ];
+    return [{ text: label }, { text: formatDuration(status.duration) }];
   }
 
   return (
@@ -129,16 +138,20 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
                   jobPath={entry.jobPath}
                   jobUrl={entry.jobUrl}
                   buildNumber={entry.buildNumber}
-                />
+                />,
               )
             }
           />
           {bUrl && <Action.OpenInBrowser title="Open in Browser" url={bUrl} />}
-          {bUrl && <Action.CopyToClipboard title="Copy Build URL" content={bUrl} />}
+          {bUrl && (
+            <Action.CopyToClipboard title="Copy Build URL" content={bUrl} />
+          )}
           <Action
             title="Re-trigger"
             icon={Icon.Play}
-            onAction={() => push(<BuildParamForm job={reconstructJob(entry)} />)}
+            onAction={() =>
+              push(<BuildParamForm job={reconstructJob(entry)} />)
+            }
           />
         </ActionPanel>
       }
