@@ -12,7 +12,11 @@ const KEYS = {
 export async function getFavorites(): Promise<string[]> {
   const raw = await LocalStorage.getItem<string>(KEYS.favorites);
   if (!raw) return [];
-  return JSON.parse(raw) as string[];
+  try {
+    return JSON.parse(raw) as string[];
+  } catch {
+    return [];
+  }
 }
 
 export async function setFavorites(paths: string[]): Promise<void> {
@@ -37,7 +41,11 @@ export async function removeFavorite(path: string): Promise<void> {
 export async function getRecentJobs(): Promise<string[]> {
   const raw = await LocalStorage.getItem<string>(KEYS.recentJobs);
   if (!raw) return [];
-  return JSON.parse(raw) as string[];
+  try {
+    return JSON.parse(raw) as string[];
+  } catch {
+    return [];
+  }
 }
 
 export async function pushRecentJob(jobPath: string): Promise<void> {
@@ -51,7 +59,11 @@ export async function pushRecentJob(jobPath: string): Promise<void> {
 export async function getBuildHistory(): Promise<BuildHistoryEntry[]> {
   const raw = await LocalStorage.getItem<string>(KEYS.buildHistory);
   if (!raw) return [];
-  return JSON.parse(raw) as BuildHistoryEntry[];
+  try {
+    return JSON.parse(raw) as BuildHistoryEntry[];
+  } catch {
+    return [];
+  }
 }
 
 export async function pushBuildHistory(entry: BuildHistoryEntry): Promise<void> {
