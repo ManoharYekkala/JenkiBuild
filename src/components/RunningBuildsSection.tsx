@@ -2,26 +2,18 @@ import { List, ActionPanel, Action, Icon, useNavigation } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { BuildHistoryEntry, JobStatus } from "../types";
 import { fetchBuildStatus, BuildStatus } from "../api/jenkins";
-import { progressBar, formatDuration } from "../utils/build";
+import { progressBar, formatDuration, buildUrl, reconstructJob } from "../utils/build";
 import { getStatusIcon } from "../utils/status";
-import { buildUrl, reconstructJob } from "../build-history";
 import { BuildStatusView } from "./BuildStatusView";
 import { BuildParamForm } from "./BuildParamForm";
 
-export function RunningBuildsSection({
-  entries,
-}: {
-  entries: BuildHistoryEntry[];
-}) {
+export function RunningBuildsSection({ entries }: { entries: BuildHistoryEntry[] }) {
   if (entries.length === 0) return null;
 
   return (
     <List.Section title="Running Builds">
       {entries.map((entry) => (
-        <RunningBuildItem
-          key={`${entry.jobPath}-${entry.triggeredAt}`}
-          entry={entry}
-        />
+        <RunningBuildItem key={`${entry.jobPath}-${entry.triggeredAt}`} entry={entry} />
       ))}
     </List.Section>
   );
@@ -62,7 +54,6 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
     return () => clearInterval(tick);
   }, [status?.building, status?.timestamp]);
 
-  // Derive icon
   function getIcon() {
     if (status && !status.building) {
       const derivedStatus: JobStatus =
@@ -81,7 +72,6 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
     return getStatusIcon(entry.status);
   }
 
-  // Compute accessories
   function getAccessories(): List.Item.Accessory[] {
     if (entry.buildNumber === 0) {
       return [{ text: "Queued" }];
@@ -92,23 +82,14 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
     if (status.building) {
       const totalMs = elapsed + status.duration;
       const pct =
-        status.estimatedDuration > 0
-          ? Math.min(
-              100,
-              Math.round((totalMs / status.estimatedDuration) * 100),
-            )
-          : 0;
+        status.estimatedDuration > 0 ? Math.min(100, Math.round((totalMs / status.estimatedDuration) * 100)) : 0;
       return [
         { text: progressBar(pct) + " " + pct + "%" },
         {
-          text:
-            formatDuration(totalMs) +
-            "/" +
-            formatDuration(status.estimatedDuration),
+          text: formatDuration(totalMs) + "/" + formatDuration(status.estimatedDuration),
         },
       ];
     }
-    // Finished
     const label =
       status.result === "SUCCESS"
         ? "OK"
@@ -143,15 +124,11 @@ function RunningBuildItem({ entry }: { entry: BuildHistoryEntry }) {
             }
           />
           {bUrl && <Action.OpenInBrowser title="Open in Browser" url={bUrl} />}
-          {bUrl && (
-            <Action.CopyToClipboard title="Copy Build URL" content={bUrl} />
-          )}
+          {bUrl && <Action.CopyToClipboard title="Copy Build URL" content={bUrl} />}
           <Action
             title="Re-trigger"
             icon={Icon.Play}
-            onAction={() =>
-              push(<BuildParamForm job={reconstructJob(entry)} />)
-            }
+            onAction={() => push(<BuildParamForm job={reconstructJob(entry)} />)}
           />
         </ActionPanel>
       }

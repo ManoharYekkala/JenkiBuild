@@ -19,15 +19,11 @@ describe("assertOk", () => {
   });
 
   it("throws JenkinsApiError for status 404 with job not found message", () => {
-    expect(() => assertOk({ ok: false, status: 404 })).toThrowError(
-      "Job not found",
-    );
+    expect(() => assertOk({ ok: false, status: 404 })).toThrowError("Job not found");
   });
 
   it("throws JenkinsApiError for status 500 with generic message", () => {
-    expect(() => assertOk({ ok: false, status: 500 })).toThrowError(
-      "Jenkins returned 500",
-    );
+    expect(() => assertOk({ ok: false, status: 500 })).toThrowError("Jenkins returned 500");
   });
 });
 
@@ -44,8 +40,6 @@ describe("handleFetchError", () => {
   });
 
   it("returns generic message for unknown Error", () => {
-    expect(handleFetchError(new Error("something broke"))).toBe(
-      "something broke",
-    );
+    expect(handleFetchError(new Error("something broke"))).toBe("something broke");
   });
 });

@@ -1,22 +1,10 @@
-import {
-  Form,
-  ActionPanel,
-  Action,
-  showToast,
-  Toast,
-  useNavigation,
-  Icon,
-} from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast, useNavigation, Icon } from "@raycast/api";
 import { BuildStatusView } from "./BuildStatusView";
 import { useCachedPromise } from "@raycast/utils";
 import { useState, useEffect } from "react";
 import { JenkinsJob, BuildParameter, BuildHistoryEntry } from "../types";
-import {
-  fetchJobParameters,
-  triggerBuild,
-  pollQueueItem,
-} from "../api/jenkins";
-import { pushBuildHistory, pushRecentJob } from "../storage";
+import { fetchJobParameters, triggerBuild, pollQueueItem } from "../api/jenkins";
+import { pushRecentJob, pushBuildHistory } from "../storage";
 import { handleFetchError } from "../utils/errors";
 
 interface BuildParamFormProps {
@@ -28,9 +16,7 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
   const { pop, push } = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: params, isLoading } = useCachedPromise(fetchJobParameters, [
-    job.url,
-  ]);
+  const { data: params, isLoading } = useCachedPromise(fetchJobParameters, [job.url]);
 
   // Auto-trigger immediately when job has no parameters
   useEffect(() => {
@@ -38,16 +24,13 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
       setIsSubmitting(true);
       handleSubmit({}).finally(() => setIsSubmitting(false));
     }
-  }, [isLoading, params]);
+  }, [isLoading, params, isSubmitting, handleSubmit]);
 
   function validate(values: Record<string, string>): boolean {
     const errors: string[] = [];
     for (const param of params ?? []) {
       const val = values[param.name];
-      if (
-        param.type !== "BooleanParameterDefinition" &&
-        (!val || val.trim() === "")
-      ) {
+      if (param.type !== "BooleanParameterDefinition" && (!val || val.trim() === "")) {
         errors.push(param.name);
       }
     }
@@ -100,20 +83,13 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
       } satisfies BuildHistoryEntry);
 
       toast.style = Toast.Style.Success;
-      toast.title = buildNumber
-        ? `Build #${buildNumber} triggered`
-        : "Build queued";
+      toast.title = buildNumber ? `Build #${buildNumber} triggered` : "Build queued";
       toast.message = job.name;
 
       pop();
-      push(
-        <BuildStatusView
-          jobName={job.name}
-          jobPath={job.path}
-          jobUrl={job.url}
-          buildNumber={buildNumber ?? 0}
-        />,
-      );
+      if (buildNumber) {
+        push(<BuildStatusView jobName={job.name} jobPath={job.path} jobUrl={job.url} buildNumber={buildNumber} />);
+      }
     } catch (error) {
       toast.style = Toast.Style.Failure;
       toast.title = "Build trigger failed";
@@ -129,9 +105,7 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
             key={param.name}
             id={param.name}
             label={param.name}
-            defaultValue={
-              param.defaultValue === true || param.defaultValue === "true"
-            }
+            defaultValue={param.defaultValue === true || param.defaultValue === "true"}
             storeValue={false}
           />
         );
@@ -141,9 +115,7 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
             key={param.name}
             id={param.name}
             title={param.name}
-            defaultValue={
-              param.defaultValue?.toString() ?? param.choices?.[0] ?? ""
-            }
+            defaultValue={param.defaultValue?.toString() ?? param.choices?.[0] ?? ""}
           >
             {(param.choices ?? []).map((choice) => (
               <Form.Dropdown.Item key={choice} value={choice} title={choice} />
@@ -198,10 +170,7 @@ export function BuildParamForm({ job }: BuildParamFormProps) {
 
       {params && params.length > 0 && (
         <>
-          <Form.Description
-            title="Parameters"
-            text={`Configure build parameters for ${job.name}`}
-          />
+          <Form.Description title="Parameters" text={`Configure build parameters for ${job.name}`} />
           <Form.Separator />
           {params.map((param) => renderParamField(param))}
         </>

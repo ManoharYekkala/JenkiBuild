@@ -1,10 +1,4 @@
-import {
-  RawJenkinsNode,
-  JenkinsJob,
-  BuildParameter,
-  JenkinsParamType,
-  LastBuild,
-} from "../types";
+import { RawJenkinsNode, JenkinsJob, BuildParameter, JenkinsParamType, LastBuild } from "../types";
 import { normalizeJobStatus } from "../utils/status";
 import { assertOk } from "../utils/errors";
 import { getPreferenceValues } from "@raycast/api";
@@ -18,16 +12,12 @@ function toHttps(url: string): string {
 }
 
 export function buildTree(depth: number): string {
-  if (depth === 0)
-    return "name,url,color,_class,lastBuild[number,timestamp,result]";
+  if (depth === 0) return "name,url,color,_class,lastBuild[number,timestamp,result]";
   const inner = buildTree(depth - 1);
   return `name,url,color,_class,jobs[${inner}]`;
 }
 
-export function flattenJobs(
-  nodes: RawJenkinsNode[],
-  parentPath = "",
-): JenkinsJob[] {
+export function flattenJobs(nodes: RawJenkinsNode[], parentPath = ""): JenkinsJob[] {
   return nodes.flatMap((node) => {
     const path = parentPath ? `${parentPath}/${node.name}` : node.name;
     const hasChildren = Array.isArray(node.jobs) && node.jobs.length > 0;
@@ -86,9 +76,7 @@ async function fetchCrumb(prefs: Preferences): Promise<Record<string, string>> {
   return { [data.crumbRequestField]: data.crumb };
 }
 
-export async function fetchJobParameters(
-  jobUrl: string,
-): Promise<BuildParameter[]> {
+export async function fetchJobParameters(jobUrl: string): Promise<BuildParameter[]> {
   const prefs = getPreferenceValues<Preferences>();
   const url = `${toHttps(jobUrl).replace(/\/$/, "")}/api/json?tree=property[parameterDefinitions[name,description,type,defaultParameterValue[value],choices]]`;
   const response = await fetch(url, {
@@ -106,9 +94,7 @@ export async function fetchJobParameters(
       }>;
     }>;
   };
-  const paramsProp = data.property?.find((p) =>
-    Array.isArray(p.parameterDefinitions),
-  );
+  const paramsProp = data.property?.find((p) => Array.isArray(p.parameterDefinitions));
   if (!paramsProp?.parameterDefinitions) return [];
   return paramsProp.parameterDefinitions.map((p) => ({
     name: p.name,
@@ -119,17 +105,12 @@ export async function fetchJobParameters(
   }));
 }
 
-export async function triggerBuild(
-  jobUrl: string,
-  params: Record<string, string>,
-): Promise<string> {
+export async function triggerBuild(jobUrl: string, params: Record<string, string>): Promise<string> {
   const prefs = getPreferenceValues<Preferences>();
   const crumbHeaders = await fetchCrumb(prefs);
   const hasParams = Object.keys(params).length > 0;
   const endpoint = hasParams ? "buildWithParameters" : "build";
-  const qs = hasParams
-    ? `?${new URLSearchParams(params).toString()}`
-    : "?delay=0sec";
+  const qs = hasParams ? `?${new URLSearchParams(params).toString()}` : "?delay=0sec";
   const url = `${toHttps(jobUrl).replace(/\/$/, "")}/${endpoint}${qs}`;
   const response = await fetch(url, {
     method: "POST",
@@ -165,9 +146,7 @@ export async function fetchBuildStatus(buildUrl: string): Promise<BuildStatus> {
   return (await response.json()) as BuildStatus;
 }
 
-export async function pollQueueItem(
-  queueItemUrl: string,
-): Promise<number | null> {
+export async function pollQueueItem(queueItemUrl: string): Promise<number | null> {
   const prefs = getPreferenceValues<Preferences>();
   const url = `${toHttps(queueItemUrl).replace(/\/$/, "")}/api/json`;
   const response = await fetch(url, {

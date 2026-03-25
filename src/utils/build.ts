@@ -1,3 +1,5 @@
+import { JenkinsJob, BuildHistoryEntry } from "../types";
+
 /**
  * Render a text-based progress bar.
  * @param pct – percentage 0-100
@@ -20,4 +22,18 @@ export function formatDuration(ms: number): string {
   const m = Math.floor(s / 60);
   const rem = s % 60;
   return rem > 0 ? `${m}m ${rem}s` : `${m}m`;
+}
+
+export function buildUrl(jobUrl: string, buildNumber: number): string | null {
+  if (buildNumber === 0) return null;
+  return `${jobUrl.replace(/\/$/, "")}/${buildNumber}/`;
+}
+
+export function reconstructJob(entry: BuildHistoryEntry): JenkinsJob {
+  return {
+    name: entry.jobName,
+    url: entry.jobUrl,
+    path: entry.jobPath,
+    status: entry.status,
+  };
 }

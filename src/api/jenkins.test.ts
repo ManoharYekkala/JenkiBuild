@@ -6,15 +6,11 @@ vi.stubGlobal("fetch", vi.fn());
 
 describe("buildTree", () => {
   it("buildTree(0) returns base fields including lastBuild", () => {
-    expect(buildTree(0)).toBe(
-      "name,url,color,_class,lastBuild[number,timestamp,result]",
-    );
+    expect(buildTree(0)).toBe("name,url,color,_class,lastBuild[number,timestamp,result]");
   });
 
   it("buildTree(1) wraps with jobs[...]", () => {
-    expect(buildTree(1)).toBe(
-      "name,url,color,_class,jobs[name,url,color,_class,lastBuild[number,timestamp,result]]",
-    );
+    expect(buildTree(1)).toBe("name,url,color,_class,jobs[name,url,color,_class,lastBuild[number,timestamp,result]]");
   });
 
   it("buildTree(6) contains 6 levels of nested jobs[", () => {
@@ -32,9 +28,7 @@ describe("buildTree", () => {
 describe("buildAuthHeader", () => {
   it("returns Basic base64(user:token)", () => {
     const header = buildAuthHeader("user", "token");
-    expect(header).toBe(
-      "Basic " + Buffer.from("user:token").toString("base64"),
-    );
+    expect(header).toBe("Basic " + Buffer.from("user:token").toString("base64"));
   });
 });
 
@@ -44,9 +38,7 @@ describe("flattenJobs", () => {
   });
 
   it("returns one JenkinsJob for a simple leaf node", () => {
-    const nodes: RawJenkinsNode[] = [
-      { name: "my-job", url: "http://jenkins/job/my-job/", color: "blue" },
-    ];
+    const nodes: RawJenkinsNode[] = [{ name: "my-job", url: "http://jenkins/job/my-job/", color: "blue" }];
     const result = flattenJobs(nodes);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
@@ -88,8 +80,7 @@ describe("flattenJobs", () => {
       {
         name: "my-multibranch",
         url: "http://jenkins/job/my-multibranch/",
-        _class:
-          "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+        _class: "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
         jobs: [
           {
             name: "main",
@@ -115,8 +106,7 @@ describe("flattenJobs", () => {
       {
         name: "empty-multibranch",
         url: "http://jenkins/job/empty-multibranch/",
-        _class:
-          "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+        _class: "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
         jobs: [],
       },
     ];
@@ -141,9 +131,7 @@ describe("flattenJobs", () => {
   });
 
   it("sets lastBuild to undefined when node has no lastBuild", () => {
-    const nodes: RawJenkinsNode[] = [
-      { name: "my-job", url: "http://jenkins/job/my-job/", color: "blue" },
-    ];
+    const nodes: RawJenkinsNode[] = [{ name: "my-job", url: "http://jenkins/job/my-job/", color: "blue" }];
     const result = flattenJobs(nodes);
     expect(result[0].lastBuild).toBeUndefined();
   });
@@ -291,8 +279,7 @@ describe("triggerBuild", () => {
       ok: false,
       status: 201,
       headers: {
-        get: (name: string) =>
-          name === "location" ? "http://jenkins/queue/item/42/" : null,
+        get: (name: string) => (name === "location" ? "http://jenkins/queue/item/42/" : null),
       },
     } as never);
 

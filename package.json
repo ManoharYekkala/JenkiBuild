@@ -22,12 +22,6 @@
       "title": "Trigger Build",
       "description": "Search and trigger Jenkins builds",
       "mode": "view"
-    },
-    {
-      "name": "build-history",
-      "title": "Build History",
-      "description": "View and re-trigger recent builds",
-      "mode": "view"
     }
   ],
   "preferences": [

@@ -11,12 +11,7 @@ interface BuildStatusViewProps {
   buildNumber: number;
 }
 
-export function BuildStatusView({
-  jobName,
-  jobPath,
-  jobUrl,
-  buildNumber,
-}: BuildStatusViewProps) {
+export function BuildStatusView({ jobName, jobPath, jobUrl, buildNumber }: BuildStatusViewProps) {
   const [status, setStatus] = useState<BuildStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -80,17 +75,10 @@ export function BuildStatusView({
     if (status.building) {
       const totalMs = elapsed + status.duration;
       const pct =
-        status.estimatedDuration > 0
-          ? Math.min(
-              100,
-              Math.round((totalMs / status.estimatedDuration) * 100),
-            )
-          : 0;
+        status.estimatedDuration > 0 ? Math.min(100, Math.round((totalMs / status.estimatedDuration) * 100)) : 0;
       lines.push(`| Elapsed | ${formatDuration(totalMs)} |`);
       if (status.estimatedDuration > 0) {
-        lines.push(
-          `| Estimated | ~${formatDuration(status.estimatedDuration)} |`,
-        );
+        lines.push(`| Estimated | ~${formatDuration(status.estimatedDuration)} |`);
         lines.push("", `**Progress: ${pct}%**`, `\`${progressBar(pct)}\``);
       }
     } else {
@@ -121,38 +109,20 @@ export function BuildStatusView({
           <Detail.Metadata>
             <Detail.Metadata.TagList title="Status">
               <Detail.Metadata.TagList.Item
-                text={
-                  status.building ? "Building" : (status.result ?? "Unknown")
-                }
+                text={status.building ? "Building" : (status.result ?? "Unknown")}
                 color={resultColor}
               />
             </Detail.Metadata.TagList>
-            <Detail.Metadata.Label
-              title="Started"
-              text={new Date(status.timestamp).toLocaleTimeString()}
-            />
-            {!status.building && (
-              <Detail.Metadata.Label
-                title="Duration"
-                text={formatDuration(status.duration)}
-              />
-            )}
+            <Detail.Metadata.Label title="Started" text={new Date(status.timestamp).toLocaleTimeString()} />
+            {!status.building && <Detail.Metadata.Label title="Duration" text={formatDuration(status.duration)} />}
             <Detail.Metadata.Separator />
-            <Detail.Metadata.Link
-              title="Open Build"
-              target={buildUrl}
-              text={`Build #${buildNumber}`}
-            />
+            <Detail.Metadata.Link title="Open Build" target={buildUrl} text={`Build #${buildNumber}`} />
           </Detail.Metadata>
         )
       }
       actions={
         <ActionPanel>
-          <Action
-            title="Open in Browser"
-            icon={Icon.Globe}
-            onAction={() => open(buildUrl)}
-          />
+          <Action title="Open in Browser" icon={Icon.Globe} onAction={() => open(buildUrl)} />
           <Action
             title="Refresh"
             icon={Icon.ArrowClockwise}

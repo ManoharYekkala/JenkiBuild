@@ -1,12 +1,7 @@
 // src/types.ts — Single source of truth for all shared types
 
 /** Jenkins job status after normalization from raw color field */
-export type JobStatus =
-  | "running"
-  | "success"
-  | "failure"
-  | "aborted"
-  | "disabled";
+export type JobStatus = "running" | "success" | "failure" | "aborted" | "disabled";
 
 /** Last build summary included in leaf-level job data */
 export interface LastBuild {
@@ -56,12 +51,6 @@ export interface JenkinsJob {
   lastBuild?: LastBuild;
 }
 
-/** Entry in the recent-jobs LocalStorage slot */
-export interface RecentJob {
-  path: string;
-  timestamp: number;
-}
-
 /** Entry in the build-history LocalStorage slot */
 export interface BuildHistoryEntry {
   jobName: string;
@@ -70,4 +59,10 @@ export interface BuildHistoryEntry {
   buildNumber: number;
   triggeredAt: number;
   status: JobStatus;
+}
+
+/** Entry in the recent-jobs LocalStorage slot */
+export interface RecentJob {
+  path: string;
+  timestamp: number;
 }

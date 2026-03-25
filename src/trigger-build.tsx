@@ -1,35 +1,17 @@
-import {
-  List,
-  Icon,
-  showToast,
-  Toast,
-  ActionPanel,
-  Action,
-  useNavigation,
-} from "@raycast/api";
+import { List, Icon, showToast, Toast, ActionPanel, Action, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { useState, useEffect, useMemo } from "react";
 import { fetchJobTree } from "./api/jenkins";
-import {
-  getFavorites,
-  getRecentJobs,
-  addFavorite,
-  removeFavorite,
-} from "./storage";
+import { getFavorites, getRecentJobs, addFavorite, removeFavorite, getBuildHistory } from "./storage";
 import { sortJobs } from "./utils/sort";
 import { handleFetchError } from "./utils/errors";
 import { JenkinsJob, BuildHistoryEntry } from "./types";
 import { relativeTime } from "./utils/time";
 import { BuildParamForm } from "./components/BuildParamForm";
-import { getBuildHistory } from "./storage";
 import { RunningBuildsSection } from "./components/RunningBuildsSection";
 import { getStatusIcon } from "./utils/status";
-import BuildHistory from "./build-history";
 
-function getAccessories(
-  job: JenkinsJob,
-  isFavorite: boolean,
-): List.Item.Accessory[] {
+function getAccessories(job: JenkinsJob, isFavorite: boolean): List.Item.Accessory[] {
   const acc: List.Item.Accessory[] = [];
   if (isFavorite) acc.push({ icon: Icon.Star, tooltip: "Favorite" });
   if (job.lastBuild) {
@@ -56,16 +38,8 @@ function JobActions({
   const { push } = useNavigation();
   return (
     <ActionPanel>
-      <Action
-        title="Trigger Build"
-        icon={Icon.Play}
-        onAction={() => push(<BuildParamForm job={job} />)}
-      />
-      <Action.OpenInBrowser
-        title="Open in Browser"
-        url={job.url}
-        shortcut={{ modifiers: ["cmd"], key: "o" }}
-      />
+      <Action title="Trigger Build" icon={Icon.Play} onAction={() => push(<BuildParamForm job={job} />)} />
+      <Action.OpenInBrowser title="Open in Browser" url={job.url} shortcut={{ modifiers: ["cmd"], key: "o" }} />
       <Action.CopyToClipboard
         title="Copy Job URL"
         content={job.url}
@@ -77,15 +51,11 @@ function JobActions({
         shortcut={{ modifiers: ["cmd", "shift"], key: "f" }}
         onAction={() => onToggleFavorite(job.path)}
       />
-      <Action
-        title="View Build History"
-        icon={Icon.Clock}
-        shortcut={{ modifiers: ["cmd"], key: "h" }}
-        onAction={() => push(<BuildHistory jobPath={job.path} />)}
-      />
     </ActionPanel>
   );
 }
+
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 
 export default function TriggerBuild() {
   const { data, isLoading, error } = useCachedPromise(fetchJobTree, [], {
@@ -95,13 +65,10 @@ export default function TriggerBuild() {
   const recentJobs = useCachedPromise(getRecentJobs);
   const buildHistory = useCachedPromise(getBuildHistory);
 
-  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
   const runningBuilds = useMemo(() => {
     if (!buildHistory.data) return [];
     const cutoff = Date.now() - TWO_HOURS_MS;
-    return buildHistory.data.filter(
-      (e: BuildHistoryEntry) => e.triggeredAt >= cutoff,
-    );
+    return buildHistory.data.filter((e: BuildHistoryEntry) => e.triggeredAt >= cutoff);
   }, [buildHistory.data]);
 
   const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());
@@ -141,10 +108,7 @@ export default function TriggerBuild() {
   const filteredJobs = useMemo(() => {
     if (!searchText) return sortedJobs;
     const q = searchText.toLowerCase();
-    return sortedJobs.filter(
-      (j) =>
-        j.path.toLowerCase().includes(q) || j.name.toLowerCase().includes(q),
-    );
+    return sortedJobs.filter((j) => j.path.toLowerCase().includes(q) || j.name.toLowerCase().includes(q));
   }, [sortedJobs, searchText]);
 
   const favoriteJobs = filteredJobs.filter((j) => favoriteSet.has(j.path));
@@ -182,13 +146,7 @@ export default function TriggerBuild() {
               subtitle={job.path}
               icon={getStatusIcon(job.status)}
               accessories={getAccessories(job, true)}
-              actions={
-                <JobActions
-                  job={job}
-                  isFavorite={true}
-                  onToggleFavorite={toggleFavorite}
-                />
-              }
+              actions={<JobActions job={job} isFavorite={true} onToggleFavorite={toggleFavorite} />}
             />
           ))}
         </List.Section>
@@ -201,13 +159,7 @@ export default function TriggerBuild() {
               title={job.name}
               icon={getStatusIcon(job.status)}
               accessories={getAccessories(job, false)}
-              actions={
-                <JobActions
-                  job={job}
-                  isFavorite={false}
-                  onToggleFavorite={toggleFavorite}
-                />
-              }
+              actions={<JobActions job={job} isFavorite={false} onToggleFavorite={toggleFavorite} />}
             />
           ))}
         </List.Section>

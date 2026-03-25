@@ -24,14 +24,10 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `trigger-build` command */
   export type TriggerBuild = ExtensionPreferences & {}
-  /** Preferences accessible in the `build-history` command */
-  export type BuildHistory = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
   /** Arguments passed to the `trigger-build` command */
   export type TriggerBuild = {}
-  /** Arguments passed to the `build-history` command */
-  export type BuildHistory = {}
 }
 
